@@ -80,6 +80,7 @@
 </template>
 
 <script setup>
+
 	const onTele = () => {
 		uni.makePhoneCall({
 			phoneNumber: '19334023967',

@@ -26,12 +26,7 @@
       }
     }
   ],
-  "globalStyle": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uniapp牛刀小试",
-    "navigationBarBackgroundColor": "#fff",
-    "backgroundColor": "#F8F8F8"
-  },
+
   "tabBar": {
     "color": "#ccc",
     "selectedColor": "$brand-theme-color",
@@ -55,8 +50,21 @@
         "pagePath": "pages/user/user",
         "text": "我的"
       }
-    ]
-    // "backgroundColor": "red"
+    ],
+    "backgroundColor": "white"
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uniapp牛刀小试",
+    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#F8F8F8"
   },
   "uniIdRouter": {}
 }

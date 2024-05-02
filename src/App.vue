@@ -13,5 +13,5 @@
 </script>
 
 <style lang="scss">
-@import 'common/style/wallpaper-style.scss';
+@import '@/common/style/wallpaper-style.scss';
 </style>
