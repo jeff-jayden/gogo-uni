@@ -12,7 +12,7 @@
       "path": "pages/class-list/class-list",
       "style": {
         "navigationBarTitleText": "分类列表",
-        "navigationStyle": "custom"
+//        "navigationStyle": "custom"
       }
     },
     {

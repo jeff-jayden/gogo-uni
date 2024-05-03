@@ -104,7 +104,6 @@ const goPreview = (id) => {
 const getBanner = async () => {
   let res = await apiGetBanner();
   bannerList.value = res.data;
-  console.log(bannerList.value);
 }
 
 const getDayRandom = async () => {

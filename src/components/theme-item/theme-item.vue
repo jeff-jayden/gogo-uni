@@ -1,8 +1,8 @@
 <template>
 	<view class="themeItem">
 		<!-- //普通得专题栏 -->
-		<navigator url="/pages/class-list/class-list" v-if="!isMore" class="box">
-			<image class="img" src="../../common/images/classify1.jpg" mode="aspectFill"></image>
+		<navigator :url="'/pages/class-list/class-list?id='+item._id+'&name='+item.name" v-if="!isMore" class="box">
+			<image class="img" :src="item.picurl" mode="aspectFill"></image>
 			<view class="mask">{{item.name}}</view>
 			<view class="tab" v-if="compareTimestamp(item.updateTime)">{{ compareTimestamp(item.updateTime) }}前更新</view>
 		</navigator>
