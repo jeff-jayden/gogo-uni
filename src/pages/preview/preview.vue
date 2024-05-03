@@ -1,13 +1,20 @@
 <template>
-  <view class="preview">
-    <swiper circular>
-      <swiper-item v-for="item in 5">
-        <image src="@/common/images/preview2.jpg" mode="aspectFill" @click="maskChange"></image>
+  <view class="preview" v-if="currentInfo">
+    <swiper circular :current="currentIndex" @change="swiperChange">
+      <swiper-item v-for="(item,index) in classList" :key="item._id">
+        <image v-show="readImgs.includes(index)" :src="item.picurl" mode="aspectFill" @click="maskChange"></image>
       </swiper-item>
     </swiper>
     
     <view class="mask" v-show="maskVisible">
-      <view class="count">7 / 12</view>
+      
+      <!-- #ifndef MP-TOUTIAO -->
+      <view class="goBack" @click="goBack" :style="{top:getStatusBarHeight()+'px'}">
+        <uni-icons type="back" color="#fff" size="20"></uni-icons>
+      </view>
+      <!-- #endif -->
+      
+      <view class="count">{{currentIndex + 1}} / {{ classList.length }}</view>
       <view class="time">
         <uni-dateformat :date="new Date()" format="hh:mm"></uni-dateformat>
       </view>
@@ -98,10 +105,77 @@
 <script setup lang="ts">
 
 import {ref} from "vue";
+import {getStatusBarHeight} from "@/utils/system";
+import {onLoad} from "@dcloudio/uni-app";
+import {apiDetailWall} from "@/api/apis";
 
 const maskVisible = ref(true)
 const popupInfo = ref(null)
 const popupStarRef = ref(null)
+const classList = ref([]);
+const currentId = ref(null)
+const currentIndex = ref(0)
+const currentInfo = ref(null);
+const readImgs = ref([]);
+
+//将存储再localstorage得数据取出放入classList
+const storgClassList = uni.getStorageSync("storgClassList") || [];
+//将原数据做处理
+classList.value = storgClassList.map(item => {
+  return {
+    ...item,
+    picurl: item.smallPicurl.replace("_small.webp", ".jpg")
+  }
+})
+
+//在一加载时做的事
+onLoad(async (e) => {
+  currentId.value = e.id;
+  if (e.type == 'share') {
+    let res = await apiDetailWall({id: currentId.value});
+    classList.value = res.data.map(item => {
+      return {
+        ...item,
+        picurl: item.smallPicurl.replace("_small.webp", ".jpg")
+      }
+    })
+  }
+  
+  //从数据集里拿出当前数据
+  currentIndex.value = classList.value.findIndex(item => item._id == currentId.value)
+  currentInfo.value = classList.value[currentIndex.value]
+  readImgsFun();
+})
+
+const swiperChange = (e) => {
+  currentIndex.value = e.detail.current;
+  currentInfo.value = classList.value[currentIndex.value]
+  readImgsFun();
+  console.log(e);
+}
+
+function readImgsFun() {
+  readImgs.value.push(
+      currentIndex.value <= 0 ? classList.value.length - 1 : currentIndex.value - 1,
+      currentIndex.value,
+      currentIndex.value >= classList.value.length - 1 ? 0 : currentIndex.value + 1
+  )
+  readImgs.value = [...new Set(readImgs.value)];
+}
+
+
+const goBack = () => {
+  uni.navigateBack({
+    success: () => {
+    
+    },
+    fail: (err) => {
+      uni.reLaunch({
+        url: "/pages/index/index"
+      })
+    }
+  })
+}
 
 const closeStar = () => {
   popupStarRef.value.close()
@@ -156,6 +230,7 @@ const maskChange = () => {
       justify-content: space-between;
       color: $text-font-color-2;
     }
+    
     .starcontent {
       display: flex;
       align-items: center;
@@ -163,6 +238,7 @@ const maskChange = () => {
       width: 100%;
       margin: auto;
       padding-top: 40rpx;
+      
       .score {
         color: #FFCA3E;
         padding-left: 10rpx;
@@ -188,6 +264,21 @@ const maskChange = () => {
       right: 0;
       margin: auto;
       width: fit-content;
+    }
+    
+    .goBack {
+      width: 38px;
+      height: 38px;
+      background: rgba(0, 0, 0, 0.5);
+      left: 30rpx;
+      margin-left: 0;
+      border-radius: 100px;
+      top: 0;
+      backdrop-filter: blur(10rpx);
+      border: 1rpx solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .count {

@@ -1,5 +1,8 @@
 <template>
 	<view class="classifyLayout">
+    
+    <custom-nav-bar title="分类"></custom-nav-bar>
+    
 		<view class="classify">
 			<theme-item v-for="item in 15"></theme-item>
 		</view>
