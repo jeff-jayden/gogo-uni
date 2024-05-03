@@ -1,9 +1,9 @@
 <template>
   <view class="classlist">
     
-<!--    <view class="goBack" @click="goBack" :style="{top:getStatusBarHeight()+'px'}">-->
-<!--      <uni-icons type="back" color="#fff" size="20"></uni-icons>-->
-<!--    </view>-->
+    <view class="loading-layout" v-if="!classifyList.length && !noData">
+      <uni-load-more status="loading"></uni-load-more>
+    </view>
     
     <view class="content">
       <navigator
@@ -15,11 +15,16 @@
       </navigator>
     </view>
   </view>
+  
+  <view class="loading-layout" v-if="classifyList.length || noData">
+    <uni-load-more :status="noData ? 'noMore' : 'loading'"></uni-load-more>
+  </view>
+  
+  <view class="safe-area-inset-bottom"></view>
 </template>
 
 <script setup>
 
-import {getStatusBarHeight} from "@/utils/system";
 import {onLoad, onReachBottom} from "@dcloudio/uni-app";
 import {ref} from "vue";
 import {apiGetClassList} from "@/api/apis";
