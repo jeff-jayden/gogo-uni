@@ -40,7 +40,7 @@
 				</template>
 				<template #custom>
 					<view class="date">
-						<uni-icons type="calendar" size="18" color="$brand-theme-color"></uni-icons>
+						<uni-icons type="calendar" size="18"></uni-icons>
 						<view class="text">
 							<uni-dateformat :date="Date.now()" format="dd日"></uni-dateformat>
 						</view>
@@ -241,7 +241,9 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-
+        :deep(.uni-icons) {
+          color: $brand-theme-color;
+        }
 				.text {
 					color: $brand-theme-color;
 					margin-left: 10rpx;

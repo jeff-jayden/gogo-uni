@@ -10,7 +10,7 @@
     {
       "path": "pages/class-list/class-list",
       "style": {
-        "navigationBarTitleText": ""
+        "navigationBarTitleText": "分类列表"
       }
     },
     {
@@ -24,9 +24,16 @@
       "style": {
         "navigationBarTitleText": "我的"
       }
+    },
+    {
+      "path": "pages/preview/preview",
+      "style": {
+        "navigationBarTitleText": "预览",
+        //    "enablePullDownRefresh": true,
+        "navigationStyle": "custom"
+      }
     }
   ],
-
   "tabBar": {
     "color": "#ccc",
     "selectedColor": "$brand-theme-color",
@@ -59,12 +66,12 @@
       "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
     }
   },
-
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uniapp牛刀小试",
     "navigationBarBackgroundColor": "#fff",
     "backgroundColor": "#F8F8F8"
+    //    "navigationStyle": "custom"
   },
   "uniIdRouter": {}
 }

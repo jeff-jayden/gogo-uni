@@ -11,23 +11,23 @@
 
 		<view class="section">
 			<view class="list">
-				<navigator class="row">
+				<navigator url="/pages/class-list/class-list" class="row">
 					<view class="left">
 						<uni-icons type="download-filled" size="20"></uni-icons>
 						<view class="text">我的下载</view>
 					</view>
 					<view class="right">
-						<view class="text">0</view>
+						<view class="text">34</view>
 						<uni-icons type="right" size="15"></uni-icons>
 					</view>
 				</navigator>
-				<navigator class="row">
+				<navigator url="/pages/class-list/class-list" class="row">
 					<view class="left">
 						<uni-icons type="star-filled" size="20"></uni-icons>
 						<view class="text">我的评分</view>
 					</view>
 					<view class="right">
-						<view class="text">0</view>
+						<view class="text">12</view>
 						<uni-icons type="right" size="15"></uni-icons>
 					</view>
 				</navigator>
@@ -72,8 +72,6 @@
 						<uni-icons type="right" size="15"></uni-icons>
 					</view>
 				</navigator>
-				<!-- <view class="">更新</view>
-				<view class="">问题</view> -->
 			</view>
 		</view>
 	</view>

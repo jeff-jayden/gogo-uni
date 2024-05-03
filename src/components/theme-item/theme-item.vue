@@ -1,13 +1,13 @@
 <template>
 	<view class="themeItem">
 		<!-- //普通得专题栏 -->
-		<navigator url="" v-if="!isMore" class="box">
+		<navigator url="/pages/class-list/class-list" v-if="!isMore" class="box">
 			<image class="img" :src="item.picurl" mode="aspectFill"></image>
 			<view class="mask">{{item.name}}</view>
 			<view class="tab" v-if="compareTimestamp(item.updateTime)">{{ compareTimestamp(item.updateTime) }}前更新</view>
 		</navigator>
 		<!-- //更多专题栏 -->
-		<navigator url="" v-else class="box more">
+		<navigator url="/pages/classify/classify" open-type="reLaunch" v-else class="box more">
 			<image class="img" src="../../common/images/more.jpg" mode="aspectFill"></image>
 			<view class="mask">
 				<uni-icons type="more" size="20"></uni-icons>
