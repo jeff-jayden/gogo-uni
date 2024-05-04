@@ -25,25 +25,27 @@
 
 <script setup>
 
-import {onLoad, onReachBottom} from "@dcloudio/uni-app";
+import {onLoad, onReachBottom, onShareAppMessage, onShareTimeline} from "@dcloudio/uni-app";
 import {ref} from "vue";
 import {apiGetClassList} from "@/api/apis";
 
 const noData = ref(false)
 const classifyList = ref([])
 const params = {
-  pageNum:1,
-  pageSize:12
+  pageNum: 1,
+  pageSize: 12
 }
 
+let pageName;
 
 onLoad((e) => {
-  console.log(e)
-  params.classid = e.id
-  
+  let {id = null, name = null, type = null} = e
+  if(type) params.type = type;
+  if(id) params.classid = id;
+  pageName = name
   //修改导航标题
   uni.setNavigationBarTitle({
-    title:e.name
+    title: name
   })
   
   getClassList()
@@ -51,22 +53,37 @@ onLoad((e) => {
 
 const getClassList = async () => {
   let res;
-  if(params.classid) {
+  if (params.classid) {
     res = await apiGetClassList(params)
   }
   classifyList.value = [...classifyList.value, ...res.data]
-  if(params.pageSize > res.data.length) noData.value = true;
-  uni.setStorageSync("storgClassList",classifyList.value);
+  if (params.pageSize > res.data.length) noData.value = true;
+  uni.setStorageSync("storgClassList", classifyList.value);
 }
 
 
-onReachBottom(()=>{
-  if(noData.value) return;
+onReachBottom(() => {
+  if (noData.value) return;
   params.pageNum++;
   getClassList();
 })
 
+//分享给好友
+onShareAppMessage((e) => {
+  return {
+    title: "咸虾米壁纸-" + pageName,
+    path: "/pages/classlist/classlist?id=" + params.classid + "&name=" + pageName
+  }
+})
 
+
+//分享朋友圈
+onShareTimeline(() => {
+  return {
+    title: "咸虾米壁纸-" + pageName,
+    query: "id=" + params.classid + "&name=" + pageName
+  }
+})
 
 const goBack = () => {
   uni.navigateBack({
