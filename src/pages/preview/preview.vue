@@ -2,7 +2,7 @@
   <view class="preview" v-if="currentInfo">
     <swiper circular :current="currentIndex" @change="swiperChange">
       <swiper-item v-for="(item,index) in classList" :key="item._id">
-        <image v-show="readImgs.includes(index)" :src="item.picurl" mode="aspectFill" @click="maskChange"></image>
+        <image v-if="readImgs.includes(index)" :src="item.picurl" mode="aspectFill" @click="maskChange"></image>
       </swiper-item>
     </swiper>
     
@@ -14,7 +14,7 @@
       </view>
       <!-- #endif -->
       
-      <view class="count">{{currentIndex + 1}} / {{ classList.length }}</view>
+      <view class="count">{{ currentIndex + 1 }} / {{ classList.length }}</view>
       <view class="time">
         <uni-dateformat :date="new Date()" format="hh:mm"></uni-dateformat>
       </view>
@@ -28,7 +28,7 @@
         </view>
         <view class="box" @click="popupStar">
           <uni-icons type="star" size="28"></uni-icons>
-          <view class="text">5分</view>
+          <view class="text">{{ currentInfo.score }}分</view>
         </view>
         <view class="box">
           <uni-icons type="download" size="28"></uni-icons>
@@ -37,21 +37,24 @@
       </view>
     </view>
     
-    <uni-popup class="popupstar" ref="popupStarRef">
+    <uni-popup class="popupstar" ref="popupStarRef" is-mask-click="false">
       <view class="starcontainer">
         <view class="starheader">
           <view></view>
-          <view class="text">壁纸评分</view>
-          <view class="close" @click="closeStar">
+          <view class="text">{{ isScore ? '评分过了~' : '壁纸评分' }}</view>
+          <view class="close" @click="clickScoreClose">
             <uni-icons type="closeempty" size="15" color="#999"></uni-icons>
           </view>
         </view>
         <view class="starcontent">
-          <uni-rate touchable allow-half :value="3.5" size="35"/>
-          <text class="score">5 分</text>
+          <uni-rate v-model="userScore" allowHalf :disabled="isScore" disabled-color="#FFCA3E"/>
+          <text class="score">{{ userScore }}分</text>
         </view>
         <view class="confirmstar">
-          <button type="default" size="mini" plain>确认评分</button>
+          <!--          还没评分或者已经评过了禁用-->
+          <button @click="submitScore" :disabled="!userScore || isScore" type="default" size="mini" plain>
+            确认评分
+          </button>
         </view>
       </view>
     </uni-popup>
@@ -70,32 +73,38 @@
           <view class="content">
             <view class="row">
               <view class="label">壁纸ID：</view>
-              <text selectable class="value">作者信息的房间大师傅艰苦的肌肤哈桑地方还是大红</text>
+              <text selectable class="value">{{ currentInfo._id }}</text>
             </view>
             <view class="row">
               <view class="label">发布者：</view>
-              <text selectable class="value">作者信息</text>
+              <text selectable class="value">{{ currentInfo.nickname }}</text>
             </view>
             <view class="row">
               <view class="label">评分：</view>
               <view class='value roteBox'>
-                <uni-rate touchable allow-half :value="3.5" size="16"/>
-                <text class="score">5 分</text>
+                <uni-rate touchable allow-half :value="currentInfo.score" size="16" readonly/>
+                <text class="score">{{ currentInfo.score }}分</text>
               </view>
             </view>
             <view class="row">
               <view class="label">摘要：</view>
-              <text selectable class="value">作者信息的健康沙发几点开始发售的和飞机喀什的话</text>
+              <text selectable class="value">{{ currentInfo.description }}</text>
             </view>
             <view class="row">
               <view class="label">标签：</view>
               <view class='value tabs'>
-                <view class="tab">
-                  张嘉译
+                <view class="tab" v-for="tab in currentInfo.tabs" :key="tab">
+                  {{ tab }}
                 </view>
               </view>
             </view>
+            <view class="copyright">
+              声明：本图片来用户投稿，非商业使用，用于免费学习交流，
+              如侵犯了您的权益，您可以拷贝壁纸ID举报至平台，邮箱513894357@qq.com，
+              管理将删除侵权壁纸，维护您的权益。
+            </view>
           </view>
+          <view class="safe-area-inset-bottom"></view>
         </scroll-view>
       </view>
     </uni-popup>
@@ -107,8 +116,10 @@
 import {ref} from "vue";
 import {getStatusBarHeight} from "@/utils/system";
 import {onLoad} from "@dcloudio/uni-app";
-import {apiDetailWall} from "@/api/apis";
+import {apiDetailWall, apiGetSetupScore} from "@/api/apis";
 
+const userScore = ref(0)
+const isScore = ref(false)
 const maskVisible = ref(true)
 const popupInfo = ref(null)
 const popupStarRef = ref(null)
@@ -147,6 +158,46 @@ onLoad(async (e) => {
   readImgsFun();
 })
 
+//评分 完之后将结果存入localstorage
+const submitScore = async () => {
+  uni.showLoading({
+    title: "加载中..."
+  })
+  let {classid, _id: wallId} = currentInfo.value;
+  let res = await apiGetSetupScore({
+    classid,
+    wallId,
+    userScore: userScore.value
+  })
+  uni.hideLoading();
+  if (res.errCode === 0) {
+    uni.showToast({
+      title: "评分成功",
+      icon: "none"
+    })
+    classList.value[currentIndex.value].userScore = userScore.value;
+    uni.setStorageSync("storgClassList", classList.value);
+    clickScoreClose();
+  }
+}
+
+//打开评分弹窗
+const popupStar = () => {
+  // 如果已经评过了 设置用户评过得分
+  if (currentInfo.value.userScore) {
+    isScore.value = true;
+    userScore.value = currentInfo.value.userScore;
+  }
+  popupStarRef.value.open();
+}
+
+//关闭评分框
+const clickScoreClose = () => {
+  popupStarRef.value.close();
+  userScore.value = 0;
+  isScore.value = false;
+}
+
 const swiperChange = (e) => {
   currentIndex.value = e.detail.current;
   currentInfo.value = classList.value[currentIndex.value]
@@ -175,14 +226,6 @@ const goBack = () => {
       })
     }
   })
-}
-
-const closeStar = () => {
-  popupStarRef.value.close()
-}
-
-const popupStar = () => {
-  popupStarRef.value.open('center')
 }
 
 const clickInfoClose = () => {
@@ -360,6 +403,17 @@ const maskChange = () => {
               margin: 0 10rpx 10rpx 0;
             }
           }
+          
+        }
+        
+        .copyright {
+          font-size: 28rpx;
+          padding: 20rpx;
+          background: #F6F6F6;
+          color: #666;
+          border-radius: 10rpx;
+          margin: 20rpx 0;
+          line-height: 1.6em;
         }
       }
     }
