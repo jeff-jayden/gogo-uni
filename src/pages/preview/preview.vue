@@ -30,7 +30,7 @@
           <uni-icons type="star" size="28"></uni-icons>
           <view class="text">{{ currentInfo.score }}分</view>
         </view>
-        <view class="box">
+        <view class="box" @click="downloadPic">
           <uni-icons type="download" size="28"></uni-icons>
           <view class="text">下载</view>
         </view>
@@ -116,7 +116,7 @@
 import {ref} from "vue";
 import {getStatusBarHeight} from "@/utils/system";
 import {onLoad} from "@dcloudio/uni-app";
-import {apiDetailWall, apiGetSetupScore} from "@/api/apis";
+import {apiDetailWall, apiGetSetupScore, apiWriteDownload} from "@/api/apis";
 
 const userScore = ref(0)
 const isScore = ref(false)
@@ -157,6 +157,87 @@ onLoad(async (e) => {
   currentInfo.value = classList.value[currentIndex.value]
   readImgsFun();
 })
+
+//下载图片
+const downloadPic = async () => {
+  try {
+    uni.showLoading({
+      title: "下载中...",
+      mask: true
+    })
+    
+    let {
+      classid,
+      _id: wallId
+    } = currentInfo.value;
+    let res = await apiWriteDownload({
+      classid,
+      wallId
+    })
+    if (res.errCode != 0) throw res;
+    //获取图片信息
+    uni.getImageInfo({
+      src: currentInfo.value?.picurl,
+      success: res => {
+        //保存图片到系统相册
+        console.log('res' + JSON.stringify(res))
+        uni.saveImageToPhotosAlbum({
+          filePath: res.path,
+          success: (res) => {
+            uni.showToast({
+              title: "保存成功，请到相册查看",
+              icon: "none"
+            })
+          },
+          fail: err => {
+            console.log('err' + JSON.stringify(err))
+            if (err.errMsg == 'saveImageToPhotosAlbum:fail cancel') {
+              uni.showToast({
+                title: '保存失败，请重新点击下载',
+                icon: "none"
+              })
+              return;
+            }
+            //获取权限
+            uni.showModal({
+              title: "授权提示",
+              content: "需要授权保存相册",
+              success: res => {
+                console.log('res1' + JSON.stringify(res))
+                if (res.confirm) {
+                  // 调起客户端小程序设置界面，返回用户设置的操作结果
+                  uni.openSetting({
+                    success: res => {
+                      console.log('res2: ' + JSON.stringify(res))
+                      if(res.authSetting['scope.writePhotosAlbum']) {
+                        uni.showToast({
+                          title: "获取授权成功",
+                          icon: "none"
+                        })
+                      }else{
+                        uni.showToast({
+                          title: "获取权限失败",
+                          icon: "none"
+                        })
+                      }
+                    }
+                  })
+                }
+              }
+            })
+          },
+          complete: () => {
+            uni.hideLoading();
+          }
+        })
+      }
+    })
+    
+  } catch (err) {
+    console.log(err)
+    uni.hideLoading();
+  }
+}
 
 //评分 完之后将结果存入localstorage
 const submitScore = async () => {
