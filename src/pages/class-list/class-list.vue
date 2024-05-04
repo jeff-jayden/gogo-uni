@@ -27,7 +27,7 @@
 
 import {onLoad, onReachBottom, onShareAppMessage, onShareTimeline} from "@dcloudio/uni-app";
 import {ref} from "vue";
-import {apiGetClassList} from "@/api/apis";
+import {apiGetClassList, apiGetHistoryList} from "@/api/apis";
 
 const noData = ref(false)
 const classifyList = ref([])
@@ -56,6 +56,8 @@ const getClassList = async () => {
   if (params.classid) {
     res = await apiGetClassList(params)
   }
+  //用于从个人界面进入历史记录得数据
+  if(params.type) res = await apiGetHistoryList(params);
   classifyList.value = [...classifyList.value, ...res.data]
   if (params.pageSize > res.data.length) noData.value = true;
   uni.setStorageSync("storgClassList", classifyList.value);
