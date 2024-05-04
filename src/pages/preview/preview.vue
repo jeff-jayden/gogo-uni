@@ -115,7 +115,7 @@
 
 import {ref} from "vue";
 import {getStatusBarHeight} from "@/utils/system";
-import {onLoad} from "@dcloudio/uni-app";
+import {onLoad, onShareAppMessage, onShareTimeline} from "@dcloudio/uni-app";
 import {apiDetailWall, apiGetSetupScore, apiWriteDownload} from "@/api/apis";
 
 const userScore = ref(0)
@@ -295,6 +295,21 @@ function readImgsFun() {
   readImgs.value = [...new Set(readImgs.value)];
 }
 
+//分享给好友
+onShareAppMessage((e)=>{
+  return {
+    title:"咸虾米壁纸",
+    path:"/pages/preview/preview?id="+currentId.value+"&type=share"
+  }
+})
+
+//分享朋友圈
+onShareTimeline(()=>{
+  return {
+    title:"咸虾米壁纸",
+    query:"id="+currentId.value+"&type=share"
+  }
+})
 
 const goBack = () => {
   uni.navigateBack({
