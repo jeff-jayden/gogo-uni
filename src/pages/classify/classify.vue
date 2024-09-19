@@ -20,7 +20,7 @@ const classifyList = ref([])
 //分享给好友
 onShareAppMessage((e)=>{
   return {
-    title:"咸虾米壁纸，精选分类",
+    title:"mini壁纸，精选分类",
     path:"/pages/classify/classify"
   }
 })
@@ -28,7 +28,7 @@ onShareAppMessage((e)=>{
 //分享朋友圈
 onShareTimeline(()=>{
   return {
-    title:"咸虾米壁纸，精选分类"
+    title:"mini壁纸，精选分类"
   }
 })
 

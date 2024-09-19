@@ -298,7 +298,7 @@ function readImgsFun() {
 //分享给好友
 onShareAppMessage((e)=>{
   return {
-    title:"咸虾米壁纸",
+    title:"mini壁纸",
     path:"/pages/preview/preview?id="+currentId.value+"&type=share"
   }
 })
@@ -306,7 +306,7 @@ onShareAppMessage((e)=>{
 //分享朋友圈
 onShareTimeline(()=>{
   return {
-    title:"咸虾米壁纸",
+    title:"mini壁纸",
     query:"id="+currentId.value+"&type=share"
   }
 })
